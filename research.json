@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "title": "Did Zepto Buy Its Growth?",
+    "subtitle": "An independent investigation into whether Zepto's discount-driven acquisition strategy created durable enterprise value — or purchased temporary growth using investor capital.",
+    "author": "Chelscy",
+    "date": "June 2026",
+    "version": "2.0"
+  },
+  "keyNumbers": {
+    "revenueFY26": "₹22,624 Cr",
+    "netLossFY26": "₹5,905 Cr",
+    "totalRaised": "$2.4B+",
+    "lastValuation": "$7B",
+    "annualUsers": "48M",
+    "darkStores": "1,139",
+    "marketShare": "29%",
+    "adRevenueFY26": "₹1,636 Cr",
+    "ebitdaLossPerOrder": "₹59",
+    "marketingCostPerOrderDrop": "91%"
+  },
+  "sources": [
+    { "name": "Zepto DRHP (Jun 2026)", "reliability": "Primary · Audited", "url": "#" },
+    { "name": "Zomato Annual Report FY26", "reliability": "Primary · Audited", "url": "#" },
+    { "name": "Swiggy IPO DRHP (Nov 2024)", "reliability": "Primary · Audited", "url": "#" },
+    { "name": "Eternal Q4 FY26 Earnings Call", "reliability": "Primary · Verified", "url": "#" },
+    { "name": "Morgan Stanley Quick Commerce Report", "reliability": "Secondary · Analyst", "url": "#" },
+    { "name": "CLSA App-racadabra Report", "reliability": "Secondary · Analyst", "url": "#" },
+    { "name": "GrowthX DRHP Analysis", "reliability": "Secondary · Derived", "url": "#" },
+    { "name": "SEBI Regulatory Filings", "reliability": "Primary · Regulatory", "url": "#" },
+    { "name": "Whalesbook Market Share Data", "reliability": "Secondary · Estimated", "url": "#" }
+  ]
+}

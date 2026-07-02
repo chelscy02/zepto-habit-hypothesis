@@ -1,0 +1,1968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zepto: An Investigation into Discount-Driven Growth — Research by Chelscy</title>
+<meta name="description" content="An independent investigation into whether Zepto's aggressive customer acquisition strategy created sustainable enterprise value or purchased temporary growth.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ─────────────────────────────────────────────── */
+:root {
+  --purple-deep:   #1E0040;
+  --purple-brand:  #3D0080;
+  --purple-mid:    #5B0EA6;
+  --purple-light:  #8B5CF6;
+  --purple-pale:   #F0EBFF;
+  --purple-tint:   #FAF8FF;
+  --coral:         #E8425A;
+  --coral-light:   #FF7088;
+  --white:         #FFFFFF;
+  --ink:           #1A0030;
+  --ink-60:        rgba(26,0,48,0.6);
+  --ink-30:        rgba(26,0,48,0.3);
+  --ink-10:        rgba(26,0,48,0.07);
+  --border:        rgba(91,14,166,0.15);
+  --border-dark:   rgba(255,255,255,0.12);
+
+  --serif:  'Instrument Serif', Georgia, serif;
+  --sans:   'IBM Plex Sans', system-ui, sans-serif;
+  --mono:   'IBM Plex Mono', monospace;
+}
+
+/* ── RESET ──────────────────────────────────────────────── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--sans);
+  background: var(--purple-tint);
+  color: var(--ink);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+img { max-width: 100%; display: block; }
+button { cursor: pointer; font-family: var(--sans); }
+
+/* ── NAV ────────────────────────────────────────────────── */
+#nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  background: rgba(30,0,64,0.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-dark);
+  height: 52px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px;
+}
+.nav-brand {
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+.nav-brand span { color: var(--coral); }
+.nav-links {
+  display: flex; gap: 4px; list-style: none;
+}
+.nav-links a {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.06em;
+  text-transform: uppercase; color: rgba(255,255,255,0.45);
+  text-decoration: none; padding: 6px 12px; border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+}
+.nav-links a:hover { color: white; background: rgba(255,255,255,0.08); }
+.nav-links a.active { color: var(--coral-light); }
+
+/* ── PROGRESS BAR ───────────────────────────────────────── */
+#progress-bar {
+  position: fixed; top: 52px; left: 0; right: 0; z-index: 199;
+  height: 2px; background: transparent;
+}
+#progress-fill {
+  height: 100%; width: 0%; background: var(--coral);
+  transition: width 0.1s;
+}
+
+/* ── HERO ───────────────────────────────────────────────── */
+#hero {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1E0040 0%, #3D0080 50%, #2D0060 100%);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 100px 80px 80px;
+  position: relative;
+  overflow: hidden;
+}
+#hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 70% 50%, rgba(139,92,246,0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-left { position: relative; z-index: 2; }
+.hero-eyebrow {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--coral-light); margin-bottom: 24px;
+  display: flex; align-items: center; gap: 10px;
+}
+.hero-eyebrow::before {
+  content: ''; display: block; width: 24px; height: 1px; background: var(--coral);
+}
+.hero-title {
+  font-family: var(--serif); font-size: clamp(38px, 5vw, 68px);
+  font-weight: 400; line-height: 1.05; letter-spacing: -0.02em;
+  color: white; margin-bottom: 12px;
+}
+.hero-title em { font-style: italic; color: var(--coral-light); }
+.hero-question {
+  font-family: var(--sans); font-size: 16px; font-weight: 300;
+  color: rgba(255,255,255,0.6); max-width: 480px;
+  line-height: 1.7; margin-bottom: 48px;
+}
+.hero-meta {
+  display: flex; flex-wrap: wrap; gap: 24px;
+}
+.hero-meta-item {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.hero-meta-value {
+  font-family: var(--mono); font-size: 22px; font-weight: 500;
+  color: white; letter-spacing: -0.01em;
+}
+.hero-meta-label {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+.hero-right {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; gap: 16px;
+  align-items: flex-end; justify-content: center;
+}
+.hero-img-main {
+  width: 320px; border-radius: 16px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+  opacity: 0.92;
+}
+.hero-img-badge {
+  position: absolute; bottom: -20px; right: 40px;
+  width: 130px; border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+  border: 2px solid rgba(255,255,255,0.15);
+}
+.hero-scroll {
+  position: absolute; bottom: 40px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  color: rgba(255,255,255,0.3);
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; z-index: 2;
+}
+.hero-scroll-line {
+  width: 1px; height: 40px; background: rgba(255,255,255,0.2);
+  animation: scroll-pulse 2s ease-in-out infinite;
+}
+@keyframes scroll-pulse {
+  0%,100% { opacity: 0.3; transform: scaleY(1); }
+  50% { opacity: 0.8; transform: scaleY(1.2); }
+}
+
+/* ── ABOUT THIS INVESTIGATION ──────────────────────────── */
+#about {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  padding: 80px;
+}
+.about-grid {
+  display: grid; grid-template-columns: 1fr 2fr; gap: 80px;
+  max-width: 1200px; margin: 0 auto;
+}
+.about-sidebar {}
+.about-sidebar h2 {
+  font-family: var(--serif); font-size: 32px; font-weight: 400;
+  letter-spacing: -0.02em; color: var(--ink); margin-bottom: 16px;
+}
+.about-sidebar p {
+  font-size: 14px; font-weight: 300; color: var(--ink-60);
+  line-height: 1.75; margin-bottom: 20px;
+}
+.about-main {}
+.about-main p {
+  font-size: 16px; font-weight: 300; color: var(--ink);
+  line-height: 1.8; margin-bottom: 20px;
+}
+.about-main p strong { font-weight: 600; color: var(--purple-brand); }
+.about-qs {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  margin-top: 32px;
+}
+.about-q {
+  background: var(--purple-pale); border-radius: 8px;
+  padding: 16px 20px; border-left: 3px solid var(--purple-mid);
+  cursor: pointer; transition: background 0.2s;
+}
+.about-q:hover { background: #E4DBFF; }
+.about-q-num {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  color: var(--purple-mid); letter-spacing: 0.1em; margin-bottom: 6px;
+}
+.about-q-text {
+  font-size: 13px; font-weight: 400; color: var(--ink); line-height: 1.5;
+}
+
+/* ── SECTION WRAPPER ────────────────────────────────────── */
+.section {
+  padding: 96px 80px;
+  max-width: 1280px; margin: 0 auto;
+}
+.section-full {
+  padding: 96px 80px;
+}
+
+/* ── QUESTION HEADER ────────────────────────────────────── */
+.q-header {
+  margin-bottom: 64px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 40px;
+}
+.q-tag {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--purple-light); margin-bottom: 16px;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.q-tag-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--purple-light);
+}
+.q-title {
+  font-family: var(--serif); font-size: clamp(28px, 3.5vw, 48px);
+  font-weight: 400; line-height: 1.15; letter-spacing: -0.02em;
+  color: var(--ink); margin-bottom: 20px; max-width: 760px;
+}
+.q-hypothesis {
+  background: var(--purple-pale); border-radius: 8px;
+  padding: 20px 24px; display: flex; gap: 16px; align-items: flex-start;
+  margin-top: 24px;
+}
+.q-hypothesis-label {
+  font-family: var(--mono); font-size: 9px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--purple-mid); white-space: nowrap; padding-top: 2px;
+}
+.q-hypothesis-text {
+  font-size: 14px; font-weight: 300; color: var(--ink); line-height: 1.65;
+}
+
+/* ── PROSE ──────────────────────────────────────────────── */
+.prose { max-width: 720px; }
+.prose p {
+  font-size: 15px; font-weight: 300; color: var(--ink);
+  line-height: 1.8; margin-bottom: 20px;
+}
+.prose p strong { font-weight: 600; }
+.prose .finding {
+  border-left: 3px solid var(--purple-mid);
+  padding: 16px 20px; background: var(--purple-pale);
+  border-radius: 0 6px 6px 0; margin: 24px 0;
+  font-size: 14px; line-height: 1.7; color: var(--ink);
+}
+.prose .dead-end {
+  border-left: 3px solid var(--ink-30);
+  padding: 14px 18px; background: rgba(0,0,0,0.03);
+  border-radius: 0 6px 6px 0; margin: 20px 0;
+  font-size: 13px; line-height: 1.65; color: var(--ink-60);
+  font-style: italic;
+}
+.prose .counter {
+  border-left: 3px solid var(--coral);
+  padding: 14px 18px; background: rgba(232,66,90,0.05);
+  border-radius: 0 6px 6px 0; margin: 20px 0;
+  font-size: 14px; line-height: 1.65; color: var(--ink);
+}
+.prose .counter .counter-label {
+  font-family: var(--mono); font-size: 9px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--coral); margin-bottom: 6px;
+}
+
+/* ── TWO COLUMN LAYOUT ──────────────────────────────────── */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+.split-60-40 { display: grid; grid-template-columns: 3fr 2fr; gap: 64px; align-items: start; }
+.split-40-60 { display: grid; grid-template-columns: 2fr 3fr; gap: 64px; align-items: start; }
+
+/* ── CONFIDENCE METER ───────────────────────────────────── */
+.confidence-block {
+  background: var(--purple-deep);
+  border-radius: 10px; padding: 24px 28px;
+  margin-top: 40px;
+}
+.confidence-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px;
+}
+.confidence-label {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.4);
+}
+.confidence-level {
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.08em;
+}
+.confidence-level.high { color: #7EE8A2; }
+.confidence-level.medium { color: #FFD166; }
+.confidence-level.low { color: var(--coral-light); }
+.confidence-track {
+  height: 4px; background: rgba(255,255,255,0.1);
+  border-radius: 2px; margin-bottom: 14px; overflow: hidden;
+}
+.confidence-fill {
+  height: 100%; border-radius: 2px;
+  transition: width 0.8s ease;
+}
+.confidence-fill.high { background: #7EE8A2; }
+.confidence-fill.medium { background: #FFD166; }
+.confidence-fill.low { background: var(--coral); }
+.confidence-text {
+  font-size: 13px; font-weight: 300; color: rgba(255,255,255,0.6);
+  line-height: 1.65;
+}
+.confidence-why {
+  margin-top: 10px;
+  font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,0.35);
+  line-height: 1.5;
+}
+
+/* ── DATA CARDS ─────────────────────────────────────────── */
+.data-card {
+  background: white; border: 1px solid var(--border);
+  border-radius: 10px; padding: 24px; margin-bottom: 16px;
+}
+.data-card-label {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-60); margin-bottom: 10px;
+}
+.data-card-value {
+  font-family: var(--mono); font-size: 32px; font-weight: 500;
+  letter-spacing: -0.02em; color: var(--ink); line-height: 1;
+  margin-bottom: 6px;
+}
+.data-card-value.positive { color: #059669; }
+.data-card-value.negative { color: var(--coral); }
+.data-card-delta {
+  font-family: var(--mono); font-size: 11px; font-weight: 400;
+  color: var(--ink-60);
+}
+.data-card-note {
+  font-size: 12px; font-weight: 300; color: var(--ink-60);
+  margin-top: 10px; line-height: 1.55; padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── METRICS GRID ───────────────────────────────────────── */
+.metrics-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1px; background: var(--border); border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden; margin: 32px 0;
+}
+.metric {
+  background: white; padding: 20px 22px;
+}
+.metric-label {
+  font-family: var(--mono); font-size: 9px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-60); margin-bottom: 8px; display: block;
+}
+.metric-val {
+  font-family: var(--mono); font-size: 26px; font-weight: 500;
+  letter-spacing: -0.02em; color: var(--ink); display: block;
+}
+.metric-val.pos { color: #059669; }
+.metric-val.neg { color: var(--coral); }
+.metric-sub {
+  font-family: var(--mono); font-size: 10px; color: var(--ink-60);
+  margin-top: 4px; display: block;
+}
+
+/* ── EVIDENCE CARDS ─────────────────────────────────────── */
+.evidence-stack { display: flex; flex-direction: column; gap: 10px; margin: 24px 0; }
+.evidence-card {
+  border: 1px solid var(--border); border-radius: 8px;
+  overflow: hidden;
+}
+.evidence-card-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 18px; cursor: pointer;
+  background: white; transition: background 0.15s;
+}
+.evidence-card-header:hover { background: var(--purple-pale); }
+.evidence-card-title {
+  font-size: 13px; font-weight: 500; color: var(--ink);
+  display: flex; align-items: center; gap: 10px;
+}
+.evidence-reliability {
+  font-family: var(--mono); font-size: 9px; font-weight: 500;
+  letter-spacing: 0.1em; padding: 2px 8px; border-radius: 3px;
+  text-transform: uppercase;
+}
+.rel-high { background: rgba(5,150,105,0.1); color: #059669; }
+.rel-med  { background: rgba(234,179,8,0.12); color: #A16207; }
+.rel-low  { background: rgba(232,66,90,0.1); color: var(--coral); }
+.evidence-card-toggle {
+  font-size: 18px; color: var(--ink-30); transition: transform 0.2s;
+}
+.evidence-card.open .evidence-card-toggle { transform: rotate(45deg); }
+.evidence-card-body {
+  display: none; padding: 14px 18px 18px;
+  background: var(--purple-tint); border-top: 1px solid var(--border);
+  font-size: 13px; font-weight: 300; color: var(--ink-60); line-height: 1.7;
+}
+.evidence-card.open .evidence-card-body { display: block; }
+.evidence-source {
+  margin-top: 10px; font-family: var(--mono); font-size: 10px;
+  color: var(--purple-light); letter-spacing: 0.06em;
+}
+
+/* ── CHART CONTAINERS ───────────────────────────────────── */
+.chart-wrap {
+  background: white; border: 1px solid var(--border);
+  border-radius: 10px; padding: 28px; margin: 24px 0;
+}
+.chart-title {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-60); margin-bottom: 6px;
+}
+.chart-subtitle {
+  font-size: 13px; font-weight: 300; color: var(--ink-60);
+  margin-bottom: 20px; line-height: 1.5;
+}
+svg.chart { overflow: visible; width: 100%; }
+.axis-t { font-family: 'IBM Plex Mono', monospace; font-size: 10px; fill: rgba(26,0,48,0.45); }
+.grid-line { stroke: rgba(26,0,48,0.06); stroke-width: 1; }
+
+/* ── SIMULATOR ──────────────────────────────────────────── */
+.simulator {
+  background: var(--purple-deep); border-radius: 12px;
+  padding: 32px; margin: 32px 0;
+}
+.simulator-title {
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45); margin-bottom: 6px;
+}
+.simulator-description {
+  font-size: 14px; font-weight: 300; color: rgba(255,255,255,0.65);
+  margin-bottom: 28px; line-height: 1.6;
+}
+.sim-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+  margin-bottom: 28px;
+}
+.sim-input-group { display: flex; flex-direction: column; gap: 10px; }
+.sim-label {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.4); display: flex;
+  justify-content: space-between; align-items: center;
+}
+.sim-label-val {
+  font-size: 13px; color: white; font-weight: 500;
+}
+.sim-slider {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 3px; border-radius: 2px;
+  background: rgba(255,255,255,0.15); outline: none;
+}
+.sim-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--coral); cursor: pointer;
+  box-shadow: 0 0 0 3px rgba(232,66,90,0.25);
+}
+.sim-slider::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--coral); cursor: pointer; border: none;
+}
+.sim-output {
+  background: rgba(255,255,255,0.06); border-radius: 8px;
+  padding: 20px 24px; display: grid;
+  grid-template-columns: repeat(3, 1fr); gap: 16px;
+}
+.sim-result-label {
+  font-family: var(--mono); font-size: 9px; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.35); margin-bottom: 6px; display: block;
+}
+.sim-result-val {
+  font-family: var(--mono); font-size: 24px; font-weight: 500;
+  letter-spacing: -0.02em; color: white; display: block;
+}
+.sim-result-val.good { color: #7EE8A2; }
+.sim-result-val.bad { color: var(--coral-light); }
+.sim-result-val.warn { color: #FFD166; }
+.sim-note {
+  margin-top: 16px; font-size: 12px; font-weight: 300;
+  color: rgba(255,255,255,0.35); line-height: 1.6;
+  border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px;
+}
+
+/* ── TIMELINE ───────────────────────────────────────────── */
+.timeline-scroll-wrap {
+  overflow-x: auto; padding: 16px 0 24px;
+  -webkit-overflow-scrolling: touch;
+}
+.timeline-track {
+  display: flex; gap: 0; min-width: 900px;
+  position: relative; padding: 40px 0 20px;
+}
+.timeline-track::before {
+  content: ''; position: absolute; top: 48px; left: 0; right: 0;
+  height: 2px; background: var(--border);
+}
+.tl-item {
+  flex: 1; padding: 0 12px; position: relative; cursor: pointer;
+}
+.tl-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--purple-mid); border: 2px solid white;
+  box-shadow: 0 0 0 2px var(--purple-mid);
+  position: absolute; top: 44px; left: 50%; transform: translateX(-50%);
+  z-index: 2; transition: transform 0.2s;
+}
+.tl-item:hover .tl-dot { transform: translateX(-50%) scale(1.4); }
+.tl-item.event-negative .tl-dot { background: var(--coral); box-shadow: 0 0 0 2px var(--coral); }
+.tl-item.event-positive .tl-dot { background: #059669; box-shadow: 0 0 0 2px #059669; }
+.tl-date {
+  font-family: var(--mono); font-size: 9px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-60); text-align: center; margin-bottom: 36px;
+}
+.tl-label {
+  text-align: center; font-size: 11px; font-weight: 400;
+  color: var(--ink); line-height: 1.4; margin-top: 20px;
+  padding-top: 4px;
+}
+.tl-amount {
+  text-align: center; font-family: var(--mono); font-size: 11px;
+  font-weight: 500; color: var(--purple-mid); margin-top: 4px;
+}
+
+/* ── COMPETITOR COMPARE ─────────────────────────────────── */
+.compare-table {
+  width: 100%; border-collapse: collapse; font-size: 13px;
+}
+.compare-table th {
+  background: var(--purple-deep); color: white; padding: 12px 16px;
+  font-family: var(--mono); font-size: 9px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase; text-align: left;
+}
+.compare-table th:first-child { border-radius: 8px 0 0 0; }
+.compare-table th:last-child { border-radius: 0 8px 0 0; }
+.compare-table td {
+  padding: 13px 16px; border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.compare-table tr:nth-child(even) td { background: rgba(91,14,166,0.025); }
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table .co-name { font-weight: 600; color: var(--ink); }
+.co-zepto { color: var(--purple-mid); }
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 3px;
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.04em;
+}
+.b-green { background: rgba(5,150,105,0.1); color: #059669; }
+.b-red   { background: rgba(232,66,90,0.1); color: var(--coral); }
+.b-amber { background: rgba(234,179,8,0.1); color: #A16207; }
+.b-purple{ background: rgba(91,14,166,0.1); color: var(--purple-mid); }
+
+/* ── SCENARIO TOGGLE ────────────────────────────────────── */
+.scenario-tabs {
+  display: flex; gap: 4px; background: rgba(91,14,166,0.08);
+  border-radius: 8px; padding: 4px; margin-bottom: 24px; width: fit-content;
+}
+.scenario-tab {
+  padding: 8px 20px; border-radius: 6px; border: none;
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  background: transparent; color: var(--ink-60);
+  transition: all 0.2s; cursor: pointer;
+}
+.scenario-tab.active-bull { background: #059669; color: white; }
+.scenario-tab.active-base { background: var(--purple-mid); color: white; }
+.scenario-tab.active-bear { background: var(--coral); color: white; }
+.scenario-panel { display: none; }
+.scenario-panel.visible { display: block; }
+.scenario-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  margin-bottom: 20px;
+}
+.scenario-metric {
+  background: white; border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px 18px;
+}
+.scenario-metric-label {
+  font-family: var(--mono); font-size: 9px; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-60); margin-bottom: 6px; display: block;
+}
+.scenario-metric-val {
+  font-family: var(--mono); font-size: 22px; font-weight: 500;
+  letter-spacing: -0.02em; color: var(--ink);
+}
+.scenario-metric-note {
+  font-size: 11px; font-weight: 300; color: var(--ink-60);
+  margin-top: 4px; line-height: 1.5;
+}
+.scenario-assumption-box {
+  background: var(--purple-pale); border-radius: 8px;
+  padding: 18px 22px; border-left: 3px solid var(--purple-mid);
+  font-size: 13px; font-weight: 300; color: var(--ink); line-height: 1.7;
+}
+.scenario-assumption-box strong { font-weight: 600; }
+
+/* ── PRODUCT TEARDOWN ───────────────────────────────────── */
+.product-stage {
+  background: white; border: 1px solid var(--border);
+  border-radius: 10px; padding: 24px 28px;
+  margin-bottom: 16px;
+}
+.product-stage-header {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 16px; cursor: pointer;
+}
+.product-stage-num {
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  color: var(--purple-mid); background: var(--purple-pale);
+  width: 28px; height: 28px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.product-stage-name {
+  font-size: 15px; font-weight: 500; color: var(--ink);
+}
+.product-stage-body { display: none; }
+.product-stage.open .product-stage-body { display: block; }
+.product-stage-body p {
+  font-size: 13px; font-weight: 300; color: var(--ink-60);
+  line-height: 1.75; margin-bottom: 12px;
+}
+.product-stage-body p:last-child { margin-bottom: 0; }
+.stage-behaviour {
+  background: var(--purple-pale); border-radius: 6px;
+  padding: 12px 16px; margin-top: 12px;
+  font-size: 12px; font-weight: 400; color: var(--purple-brand);
+  line-height: 1.6;
+}
+.stage-behaviour strong { font-weight: 600; }
+
+/* ── RISK REGISTER ──────────────────────────────────────── */
+.risk-item {
+  background: white; border: 1px solid var(--border);
+  border-radius: 8px; padding: 20px 24px; margin-bottom: 12px;
+  display: grid; grid-template-columns: 1fr auto auto; gap: 24px;
+  align-items: center;
+}
+.risk-name {
+  font-size: 14px; font-weight: 500; color: var(--ink);
+  margin-bottom: 4px;
+}
+.risk-desc {
+  font-size: 12px; font-weight: 300; color: var(--ink-60); line-height: 1.55;
+}
+.risk-pill-wrap { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.risk-pill-label { font-family: var(--mono); font-size: 9px; color: var(--ink-60); letter-spacing: 0.08em; text-transform: uppercase; }
+.risk-pill {
+  padding: 3px 12px; border-radius: 12px;
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  white-space: nowrap;
+}
+.pill-high { background: rgba(232,66,90,0.12); color: var(--coral); }
+.pill-med  { background: rgba(234,179,8,0.12); color: #A16207; }
+.pill-low  { background: rgba(5,150,105,0.1); color: #059669; }
+
+/* ── FOOTER ─────────────────────────────────────────────── */
+#footer {
+  background: var(--purple-deep);
+  padding: 64px 80px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.footer-grid {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 64px;
+}
+.footer-about h3 {
+  font-family: var(--serif); font-size: 24px; color: white;
+  font-weight: 400; margin-bottom: 12px;
+}
+.footer-about p {
+  font-size: 13px; font-weight: 300; color: rgba(255,255,255,0.45);
+  line-height: 1.7; max-width: 380px;
+}
+.footer-col h4 {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(255,255,255,0.3); margin-bottom: 16px;
+}
+.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.footer-col ul li { font-size: 13px; font-weight: 300; color: rgba(255,255,255,0.5); }
+.footer-col ul li a { color: rgba(255,255,255,0.5); text-decoration: none; }
+.footer-col ul li a:hover { color: white; }
+.footer-bottom {
+  max-width: 1200px; margin: 40px auto 0;
+  padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.footer-bottom p {
+  font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.25);
+  letter-spacing: 0.06em;
+}
+
+/* ── SECTION BACKGROUNDS ─────────────────────────────────── */
+.bg-white { background: white; }
+.bg-tint  { background: var(--purple-tint); }
+.bg-pale  { background: var(--purple-pale); }
+.bg-dark  { background: var(--purple-deep); }
+
+/* ── UTILITY ─────────────────────────────────────────────── */
+.mt8  { margin-top: 8px;  }
+.mt16 { margin-top: 16px; }
+.mt24 { margin-top: 24px; }
+.mt32 { margin-top: 32px; }
+.mt48 { margin-top: 48px; }
+.mb8  { margin-bottom: 8px; }
+.mb16 { margin-bottom: 16px; }
+.mb24 { margin-bottom: 24px; }
+.mb32 { margin-bottom: 32px; }
+.source-tag {
+  display: inline-block; font-family: var(--mono); font-size: 10px;
+  color: var(--purple-light); background: var(--purple-pale);
+  padding: 2px 8px; border-radius: 3px; letter-spacing: 0.04em;
+}
+.section-divider {
+  height: 1px; background: var(--border);
+  margin: 0; border: none;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+  #hero { grid-template-columns: 1fr; padding: 90px 28px 60px; }
+  .hero-right { display: none; }
+  #about, .section, .section-full { padding: 64px 28px; }
+  .about-grid { grid-template-columns: 1fr; gap: 40px; }
+  .about-qs { grid-template-columns: 1fr; }
+  .split, .split-60-40, .split-40-60 { grid-template-columns: 1fr; gap: 40px; }
+  .sim-grid { grid-template-columns: 1fr; }
+  .sim-output { grid-template-columns: 1fr 1fr; }
+  .scenario-grid { grid-template-columns: 1fr; }
+  #footer { padding: 48px 28px; }
+  .footer-grid { grid-template-columns: 1fr; gap: 40px; }
+  .risk-item { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  .metrics-row { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── SCROLL REVEAL ───────────────────────────────────────── */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <span class="nav-brand">Zepto <span>/</span> An Investigation</span>
+  <ul class="nav-links">
+    <li><a href="#about">Context</a></li>
+    <li><a href="#q1">Q1 Acquisition</a></li>
+    <li><a href="#q2">Q2 Habit</a></li>
+    <li><a href="#q3">Q3 Ad Moat</a></li>
+    <li><a href="#q4">Q4 Profitability</a></li>
+    <li><a href="#q5">Q5 Risks</a></li>
+    <li><a href="#verdict">Verdict</a></li>
+  </ul>
+</nav>
+<div id="progress-bar"><div id="progress-fill"></div></div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Independent Research · June 2026</div>
+    <h1 class="hero-title">Did Zepto <em>buy</em><br>its growth?</h1>
+    <p class="hero-question">
+      Zepto has raised $2.4 billion and reported ₹5,905 crore in losses in FY26 alone.
+      I wanted to understand whether that spending created something durable — or whether it purchased a customer base that will leave when the discounts do.
+    </p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <span class="hero-meta-value">₹22,624 Cr</span>
+        <span class="hero-meta-label">Revenue FY26</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-value">$7B</span>
+        <span class="hero-meta-label">Last valuation</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-value">5 questions</span>
+        <span class="hero-meta-label">Investigated</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div style="position:relative; width:320px;">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Zepto_Logo.svg/1200px-Zepto_Logo.svg.png"
+           style="display:none" alt="">
+      <!-- Purple gradient placeholder that matches Zepto brand -->
+      <div style="width:320px; height:360px; background:linear-gradient(145deg,#4A0090,#2D0060);
+                  border-radius:20px; display:flex; flex-direction:column;
+                  align-items:center; justify-content:center; gap:16px;
+                  box-shadow:0 32px 80px rgba(0,0,0,0.6); padding:32px;">
+        <div style="font-family:var(--serif);font-size:52px;font-weight:400;color:white;
+                    letter-spacing:-0.03em;line-height:1;">zepto</div>
+        <div style="font-family:var(--mono);font-size:11px;letter-spacing:0.2em;
+                    color:rgba(255,255,255,0.4);text-transform:uppercase;">10-minute delivery</div>
+        <div style="width:60px;height:2px;background:var(--coral);border-radius:1px;margin:8px 0;"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;">
+          <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:14px;text-align:center;">
+            <div style="font-family:var(--mono);font-size:18px;color:white;font-weight:500;">1,139</div>
+            <div style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px;">Dark Stores</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:14px;text-align:center;">
+            <div style="font-family:var(--mono);font-size:18px;color:var(--coral-light);font-weight:500;">48M</div>
+            <div style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px;">Annual Users</div>
+          </div>
+        </div>
+        <div style="background:rgba(232,66,90,0.15);border-radius:8px;padding:14px;width:100%;text-align:center;">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--coral-light);letter-spacing:0.06em;">IPO FILING · JULY 2026</div>
+          <div style="font-family:var(--mono);font-size:20px;color:white;font-weight:500;margin-top:4px;">₹8,010 Cr</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    <span>scroll</span>
+  </div>
+</section>
+
+<!-- ABOUT THIS INVESTIGATION -->
+<section id="about" class="bg-white">
+  <div class="about-grid" style="max-width:1200px;margin:0 auto;">
+    <div class="about-sidebar">
+      <h2>Why I chose Zepto</h2>
+      <p>I use Zepto. Most people I know use Zepto. But as a commerce and strategy student, I kept asking a question I couldn't find a rigorous answer to anywhere: are they building something real, or are they running an elaborate cash transfer from VCs to consumers?</p>
+      <p>When their DRHP dropped in December 2025, it gave me access to actual audited data for the first time. I spent several weeks going through it alongside Zomato's annual reports, Swiggy's IPO filing, and every piece of industry research I could find.</p>
+      <p>This is what I found. I've tried to be explicit about what I know, what I've estimated, and where I'm genuinely uncertain.</p>
+      <div style="margin-top:28px; padding:16px 20px; background:var(--purple-pale); border-radius:8px;">
+        <div style="font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--purple-mid);margin-bottom:10px;">Primary sources used</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div class="source-tag">Zepto DRHP (Jun 2026)</div>
+          <div class="source-tag">Zomato Annual Report FY26</div>
+          <div class="source-tag">Swiggy IPO DRHP (Nov 2024)</div>
+          <div class="source-tag">SEBI Filings</div>
+          <div class="source-tag">Morgan Stanley QC Report</div>
+          <div class="source-tag">CLSA App-racadabra Report</div>
+          <div class="source-tag">GrowthX DRHP Analysis</div>
+        </div>
+      </div>
+    </div>
+    <div class="about-main">
+      <p>My starting assumption, going in, was that Zepto's discount strategy was financially reckless. Most reporting on the company frames it as a cash-burning machine that built loyalty on shaky foundations. <strong>That framing turned out to be too simple.</strong></p>
+      <p>The DRHP contains a data point I did not expect: 45–49% of users who placed their first Zepto order in FY23 were still active on the platform three years later. That's a retention figure most consumer apps would consider excellent. It made me question my initial assumption.</p>
+      <p>But the DRHP also contains a troubling counter-signal: users acquired in FY25 show only 31% retention at the same stage of their lifecycle. Whether that's a temporary cohort effect or structural deterioration is the most important unresolved question in this entire investigation.</p>
+      <p>The five questions below represent the investigative threads I followed. Each one changed my thinking in some way. I've tried to show the reasoning, not just the conclusions.</p>
+      <div class="about-qs">
+        <div class="about-q" onclick="document.getElementById('q1').scrollIntoView({behavior:'smooth'})">
+          <div class="about-q-num">Question 1</div>
+          <div class="about-q-text">Can Zepto acquire customers without permanently relying on discounts?</div>
+        </div>
+        <div class="about-q" onclick="document.getElementById('q2').scrollIntoView({behavior:'smooth'})">
+          <div class="about-q-num">Question 2</div>
+          <div class="about-q-text">Do customers actually become habitual users after the discount ends?</div>
+        </div>
+        <div class="about-q" onclick="document.getElementById('q3').scrollIntoView({behavior:'smooth'})">
+          <div class="about-q-num">Question 3</div>
+          <div class="about-q-text">Does advertising revenue replace subsidy economics at scale?</div>
+        </div>
+        <div class="about-q" onclick="document.getElementById('q4').scrollIntoView({behavior:'smooth'})">
+          <div class="about-q-num">Question 4</div>
+          <div class="about-q-text">Can the business actually become profitable before capital runs out?</div>
+        </div>
+        <div class="about-q" onclick="document.getElementById('q5').scrollIntoView({behavior:'smooth'})">
+          <div class="about-q-num">Question 5</div>
+          <div class="about-q-text">What conditions would make my entire thesis wrong?</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────────────────────────────────────── -->
+<!-- QUESTION 1 -->
+<!-- ───────────────────────────────────────────── -->
+<hr class="section-divider">
+<div id="q1" class="section-full bg-tint">
+<div class="section" style="padding-top:0; padding-bottom:0;">
+
+  <div class="q-header reveal">
+    <div class="q-tag"><div class="q-tag-dot"></div>Question 1</div>
+    <h2 class="q-title">Can Zepto acquire customers without permanently relying on discounts?</h2>
+    <div class="q-hypothesis">
+      <div class="q-hypothesis-label">My hypothesis going in</div>
+      <div class="q-hypothesis-text">My initial assumption was that Zepto's growth was almost entirely discount-driven — that the company was essentially paying people to try the app, and that reducing subsidies would cause immediate churn. I expected the data to confirm this. It partially did, but the direction of travel surprised me.</div>
+    </div>
+  </div>
+
+  <div class="split-60-40 reveal">
+    <div>
+      <div class="prose">
+        <p>The most useful metric I found for this question wasn't retention data or GMV figures. It was a single line in the DRHP: <strong>digital marketing cost per order fell from ₹10.82 in Q1 FY24 to ₹1.01 in Q4 FY26</strong>. That's a 91% decline over ten quarters.</p>
+        <p>I spent some time trying to find alternative explanations for this number before accepting it at face value. Could it be that Zepto simply shifted spend from digital performance marketing to offline channels? The total advertising spend grew from ₹304 crore in FY24 to ₹1,389 crore in FY26, so the absolute marketing budget expanded significantly — it's not that they stopped spending.</p>
+        <p>The more plausible interpretation is that a growing proportion of orders are coming from users who were not acquired via paid ads. They're returning because they've used the app before, not because they saw a promotional banner. If this is accurate, it suggests that some portion of the discount spending earlier in the company's life did result in organic return behaviour.</p>
+        <div class="dead-end">I attempted to separate repeat order rates from acquisition-driven orders using the DRHP data. The DRHP does not break this down by channel. I couldn't verify the organic vs. paid split directly, so the 91% cost decline remains a proxy rather than a confirmed causal signal.</div>
+        <p>I looked at this alongside the blended customer acquisition cost. Using total FY26 advertising spend (₹1,389 crore) divided across the net new annual transacting users added between FY24 and FY26 (roughly 37 million new users), the implied blended CAC is somewhere between ₹800 and ₹1,400 per acquired user. That's a wide range, and the actual figure depends heavily on what proportion of ad spend was retention-focused vs. acquisition-focused — which the DRHP doesn't specify.</p>
+        <div class="finding">The direction of evidence on Question 1 is moderately positive. Marketing cost per order has fallen dramatically, which is consistent with — but not definitive proof of — organic habit formation reducing paid acquisition dependency. The remaining uncertainty is whether this trend holds as Zepto expands into less familiar geographies.</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="chart-wrap reveal">
+        <div class="chart-title">Digital marketing cost per order</div>
+        <div class="chart-subtitle">Q1 FY24 → Q4 FY26. Source: Zepto DRHP, June 2026</div>
+        <svg class="chart" viewBox="0 0 320 200" height="200">
+          <line x1="40" y1="180" x2="300" y2="180" stroke="rgba(26,0,48,0.1)" stroke-width="1"/>
+          <line x1="40" y1="20" x2="40" y2="180" stroke="rgba(26,0,48,0.1)" stroke-width="1"/>
+          <!-- grid -->
+          <line x1="40" y1="50" x2="300" y2="50" class="grid-line" stroke-dasharray="4,4"/>
+          <line x1="40" y1="90" x2="300" y2="90" class="grid-line" stroke-dasharray="4,4"/>
+          <line x1="40" y1="130" x2="300" y2="130" class="grid-line" stroke-dasharray="4,4"/>
+          <!-- y labels -->
+          <text x="34" y="54" class="axis-t" text-anchor="end">₹10</text>
+          <text x="34" y="94" class="axis-t" text-anchor="end">₹7</text>
+          <text x="34" y="134" class="axis-t" text-anchor="end">₹4</text>
+          <text x="34" y="184" class="axis-t" text-anchor="end">₹0</text>
+          <!-- x labels -->
+          <text x="55" y="194" class="axis-t" text-anchor="middle">Q1 FY24</text>
+          <text x="178" y="194" class="axis-t" text-anchor="middle">Q2 FY25</text>
+          <text x="300" y="194" class="axis-t" text-anchor="middle">Q4 FY26</text>
+          <!-- area fill -->
+          <path d="M 55,25 L 90,50 L 125,80 L 160,108 L 195,128 L 230,148 L 265,163 L 300,177 L 300,180 L 55,180 Z"
+                fill="rgba(91,14,166,0.08)"/>
+          <!-- line -->
+          <polyline points="55,25 90,50 125,80 160,108 195,128 230,148 265,163 300,177"
+                    fill="none" stroke="var(--purple-mid)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- dots -->
+          <circle cx="55"  cy="25"  r="4" fill="var(--purple-mid)"/>
+          <circle cx="300" cy="177" r="5" fill="#059669"/>
+          <!-- labels -->
+          <text x="60"  y="18"  class="axis-t" fill="var(--purple-mid)" font-weight="600">₹10.82</text>
+          <text x="270" y="172" class="axis-t" fill="#059669" font-weight="600">₹1.01</text>
+          <!-- annotation -->
+          <rect x="110" y="95" width="100" height="26" rx="4" fill="rgba(5,150,105,0.1)"/>
+          <text x="160" y="110" class="axis-t" text-anchor="middle" fill="#059669" font-weight="600">↓ 91% in 10 quarters</text>
+        </svg>
+      </div>
+
+      <div class="data-card reveal">
+        <div class="data-card-label">Total ad spend FY26</div>
+        <div class="data-card-value">₹1,389 Cr</div>
+        <div class="data-card-delta">Up from ₹304 Cr in FY24 — but cost per order fell 91%</div>
+        <div class="data-card-note">The total budget expanded while the per-order cost collapsed. This suggests that the spend is now covering far more orders, not that each order became cheaper to acquire individually. Interpretation: organic repeat orders have grown as a share of total orders.</div>
+      </div>
+
+      <!-- Unit economics simulator -->
+      <div class="simulator reveal">
+        <div class="simulator-title">Unit Economics Simulator</div>
+        <div class="simulator-description">Adjust inputs to see how contribution margin changes. This helps visualise why per-order profitability is so sensitive to small changes in discount and delivery cost.</div>
+        <div class="sim-grid">
+          <div class="sim-input-group">
+            <div class="sim-label">
+              Average Order Value (₹)
+              <span class="sim-label-val" id="lbl-aov">₹550</span>
+            </div>
+            <input type="range" class="sim-slider" id="sl-aov" min="300" max="900" value="550" oninput="calcUE()">
+          </div>
+          <div class="sim-input-group">
+            <div class="sim-label">
+              COGS % of AOV
+              <span class="sim-label-val" id="lbl-cogs">89%</span>
+            </div>
+            <input type="range" class="sim-slider" id="sl-cogs" min="78" max="95" value="89" oninput="calcUE()">
+          </div>
+          <div class="sim-input-group">
+            <div class="sim-label">
+              Discount per order (₹)
+              <span class="sim-label-val" id="lbl-disc">₹30</span>
+            </div>
+            <input type="range" class="sim-slider" id="sl-disc" min="0" max="150" value="30" oninput="calcUE()">
+          </div>
+          <div class="sim-input-group">
+            <div class="sim-label">
+              Delivery + ops cost (₹)
+              <span class="sim-label-val" id="lbl-del">₹92</span>
+            </div>
+            <input type="range" class="sim-slider" id="sl-del" min="50" max="200" value="92" oninput="calcUE()">
+          </div>
+        </div>
+        <div class="sim-output">
+          <div>
+            <span class="sim-result-label">Gross Margin / Order</span>
+            <span class="sim-result-val" id="out-gm">₹61</span>
+          </div>
+          <div>
+            <span class="sim-result-label">Contribution Margin</span>
+            <span class="sim-result-val" id="out-cm">–₹61</span>
+          </div>
+          <div>
+            <span class="sim-result-label">Payback (orders @ repeat)</span>
+            <span class="sim-result-val" id="out-pb">~18</span>
+          </div>
+        </div>
+        <div class="sim-note">CAC assumed ₹1,100 for payback calculation. Gross margin = AOV × (1 – COGS%). Contribution margin = Gross margin – delivery cost – discount. When contribution margin is positive, payback = CAC ÷ contribution margin.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="confidence-block reveal mt48">
+    <div class="confidence-header">
+      <span class="confidence-label">Conclusion confidence — Question 1</span>
+      <span class="confidence-level medium">Medium confidence</span>
+    </div>
+    <div class="confidence-track"><div class="confidence-fill medium" style="width:58%"></div></div>
+    <div class="confidence-text">The evidence suggests Zepto is reducing paid acquisition dependency, but this cannot be confirmed from public data alone. The 91% marketing cost per order drop is real and sourced directly from the DRHP. The interpretation — that this reflects habit formation rather than channel shifting — is plausible but unverified.</div>
+    <div class="confidence-why">Why not higher: Cannot verify organic vs. paid split from public data. Why not lower: The DRHP figure is audited and the direction is consistent across multiple quarters.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- ───────────────────────────────────────────── -->
+<!-- QUESTION 2 -->
+<!-- ───────────────────────────────────────────── -->
+<hr class="section-divider">
+<div id="q2" class="section-full bg-white">
+<div class="section" style="padding-top:0; padding-bottom:0;">
+
+  <div class="q-header reveal">
+    <div class="q-tag"><div class="q-tag-dot"></div>Question 2</div>
+    <h2 class="q-title">Do customers actually become habitual users after the discount ends?</h2>
+    <div class="q-hypothesis">
+      <div class="q-hypothesis-label">My hypothesis going in</div>
+      <div class="q-hypothesis-text">I expected retention data to be weak — the standard critique of discount-led acquisition is that price-sensitive customers churn immediately when incentives disappear. I assumed I would find evidence supporting this view. Instead, I found a more complicated picture.</div>
+    </div>
+  </div>
+
+  <div class="split reveal">
+    <div class="prose">
+      <p>The DRHP discloses that <strong>45.2% to 49.8% of users who placed their first order in FY23 were still active three years later</strong>. I want to be careful about how I interpret this, because the number is genuinely surprising and I initially assumed I was misreading the DRHP.</p>
+      <p>After reviewing the relevant section multiple times, the number appears to be a real disclosure. The FY23 cohort — acquired three years ago, well before the current IPO momentum — is retaining at roughly half its original size after three years. For a grocery delivery app competing against Blinkit, Instamart, and the local kirana, that is a meaningful retention figure.</p>
+      <p>What explains it? One signal is category expansion. The DRHP reports that new users purchase from 2–3 product categories in their first month. By month 23, that number expands to around 18 categories. A user who originally downloaded Zepto for vegetables and now buys from electronics, pharmacy, and personal care on the same platform is substantially harder to replace with a competitor.</p>
+      <div class="counter">
+        <div class="counter-label">Counter-evidence I cannot ignore</div>
+        The FY25 Q3 cohort showed only 31.1% retention by Q4 FY26 — materially lower than the FY23 cohort at the same lifecycle stage. The FY26 Q1 cohort was at 32% by Q3 FY26. Whether this is because newer users are more price-sensitive, because Zepto is expanding into geographies where habits form more slowly, or because competitive intensity has increased, I cannot determine from public data.
+      </div>
+      <p>I also looked at monthly active users. The DRHP notes that Zepto's month-on-month user count in March 2026 showed a sequential decline for the first time — this is an early warning signal that sits uncomfortably alongside the positive FY23 retention numbers.</p>
+      <div class="finding">The habit thesis is supported for early cohorts. It is not yet confirmed for cohorts acquired in FY25 and FY26. The divergence between these cohorts is the most important unresolved data point in this entire project. The answer will only be visible in the data by late 2027.</div>
+    </div>
+
+    <div>
+      <!-- Retention chart -->
+      <div class="chart-wrap reveal">
+        <div class="chart-title">Cohort retention over time (estimated)</div>
+        <div class="chart-subtitle">FY23 cohort vs FY25 cohort at equivalent lifecycle stages. Curves estimated from DRHP disclosure points. Full monthly data not publicly available.</div>
+        <svg class="chart" viewBox="0 0 320 210" height="210">
+          <line x1="40" y1="190" x2="300" y2="190" stroke="rgba(26,0,48,0.1)"/>
+          <line x1="40" y1="20" x2="40" y2="190" stroke="rgba(26,0,48,0.1)"/>
+          <!-- grid lines -->
+          <line x1="40" y1="60" x2="300" y2="60" class="grid-line" stroke-dasharray="4,4"/>
+          <line x1="40" y1="100" x2="300" y2="100" class="grid-line" stroke-dasharray="4,4"/>
+          <line x1="40" y1="140" x2="300" y2="140" class="grid-line" stroke-dasharray="4,4"/>
+          <!-- Y axis -->
+          <text x="34" y="63"  class="axis-t" text-anchor="end">60%</text>
+          <text x="34" y="103" class="axis-t" text-anchor="end">45%</text>
+          <text x="34" y="143" class="axis-t" text-anchor="end">30%</text>
+          <text x="34" y="194" class="axis-t" text-anchor="end">0%</text>
+          <!-- X axis labels -->
+          <text x="40"  y="204" class="axis-t" text-anchor="middle">M0</text>
+          <text x="100" y="204" class="axis-t" text-anchor="middle">M6</text>
+          <text x="160" y="204" class="axis-t" text-anchor="middle">M12</text>
+          <text x="220" y="204" class="axis-t" text-anchor="middle">M24</text>
+          <text x="280" y="204" class="axis-t" text-anchor="middle">M36</text>
+          <!-- 45% reference line -->
+          <line x1="40" y1="103" x2="300" y2="103" stroke="#059669" stroke-width="1" stroke-dasharray="6,4" opacity="0.4"/>
+          <text x="302" y="106" class="axis-t" fill="#059669" font-size="9">45%</text>
+          <!-- FY23 cohort area -->
+          <path d="M 40,30 L 80,52 L 120,74 L 160,90 L 220,100 L 280,103 L 300,104 L 300,190 L 40,190 Z"
+                fill="rgba(91,14,166,0.07)"/>
+          <!-- FY23 cohort line -->
+          <polyline points="40,30 80,52 120,74 160,90 220,100 280,103 300,104"
+                    fill="none" stroke="var(--purple-mid)" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- FY25 cohort line (dashed) -->
+          <polyline points="40,30 80,58 120,90 160,118 220,130 260,132"
+                    fill="none" stroke="var(--coral)" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7,4"/>
+          <!-- dots at disclosed points -->
+          <circle cx="300" cy="104" r="4" fill="var(--purple-mid)"/>
+          <circle cx="260" cy="132" r="4" fill="var(--coral)"/>
+          <!-- labels -->
+          <text x="190" y="88"  class="axis-t" fill="var(--purple-mid)" font-weight="600">FY23 cohort ~47%</text>
+          <text x="165" y="145" class="axis-t" fill="var(--coral)" font-weight="600">FY25 cohort 31.1%</text>
+        </svg>
+        <div style="margin-top:12px;font-family:var(--mono);font-size:10px;color:var(--ink-30);line-height:1.6;">Disclosed data points: FY23 3-year retention 45.2–49.8% (DRHP). FY25 Q3 cohort at 31.1% by Q4 FY26 (GrowthX analysis of DRHP). Full monthly curves estimated for illustration.</div>
+      </div>
+
+      <!-- Category expansion -->
+      <div class="data-card reveal mt16">
+        <div class="data-card-label">Category expansion signal</div>
+        <div class="data-card-value">2.6 → 18</div>
+        <div class="data-card-delta">Product categories per user: month 1 vs. month 23</div>
+        <div class="data-card-note">A user buying from 18 categories has restructured their purchasing around Zepto. The marginal cost of switching to a competitor increases with every new category. This is one of the more credible retention mechanisms in the DRHP disclosures.</div>
+      </div>
+
+      <!-- Retention simulator -->
+      <div class="simulator reveal mt16">
+        <div class="simulator-title">Retention → LTV Impact Simulator</div>
+        <div class="simulator-description">Change the 3-year retention assumption to see how it flows through to estimated customer LTV.</div>
+        <div class="sim-grid">
+          <div class="sim-input-group">
+            <div class="sim-label">3-Year retention rate<span class="sim-label-val" id="lbl-ret">45%</span></div>
+            <input type="range" class="sim-slider" id="sl-ret" min="15" max="65" value="45" oninput="calcLTV()">
+          </div>
+          <div class="sim-input-group">
+            <div class="sim-label">Monthly order frequency<span class="sim-label-val" id="lbl-freq">6x</span></div>
+            <input type="range" class="sim-slider" id="sl-freq" min="2" max="14" value="6" oninput="calcLTV()">
+          </div>
+        </div>
+        <div class="sim-output">
+          <div>
+            <span class="sim-result-label">36-Month LTV (₹)</span>
+            <span class="sim-result-val" id="out-ltv">₹8,100</span>
+          </div>
+          <div>
+            <span class="sim-result-label">vs. CAC (₹1,100)</span>
+            <span class="sim-result-val" id="out-ltvr">7.4x</span>
+          </div>
+          <div>
+            <span class="sim-result-label">Payback (months)</span>
+            <span class="sim-result-val" id="out-pbm">5.5</span>
+          </div>
+        </div>
+        <div class="sim-note">LTV = average monthly contribution (₹45 est.) × avg. retention-weighted months active over 36. LTV ratio and payback are rough proxies. Contribution margin assumed at ₹45/order based on DRHP improvement trend toward breakeven.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product teardown -->
+  <div class="mt48 reveal">
+    <h3 style="font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-60);margin-bottom:20px;">Product teardown — how Zepto tries to install the habit</h3>
+    <div class="product-stage" onclick="toggleStage(this)">
+      <div class="product-stage-header">
+        <div class="product-stage-num">1</div>
+        <div class="product-stage-name">First-order onboarding — the trigger installation</div>
+        <div style="margin-left:auto;font-size:18px;color:var(--ink-30);">+</div>
+      </div>
+      <div class="product-stage-body">
+        <p>The app opens to a location confirmation, then immediately surfaces "10 minutes" prominently. Everything about the first session is designed to anchor one association: if I need something now, Zepto solves it. The first-order cashback (typically ₹100–200) removes the price barrier to testing this claim.</p>
+        <p>The 10-minute delivery promise is also a product commitment that the company spends enormous operational cost to maintain. Every time it's fulfilled, it reinforces the core behavioural trigger. Compared to Blinkit and Instamart, Zepto has historically been more aggressive about maintaining this promise even in lower-density geographies.</p>
+        <div class="stage-behaviour"><strong>Behaviour being installed:</strong> "When I need something immediately, I open Zepto before I consider alternatives."</div>
+      </div>
+    </div>
+    <div class="product-stage" onclick="toggleStage(this)">
+      <div class="product-stage-header">
+        <div class="product-stage-num">2</div>
+        <div class="product-stage-name">Zepto Pass — converting occasional users to committed ones</div>
+        <div style="margin-left:auto;font-size:18px;color:var(--ink-30);">+</div>
+      </div>
+      <div class="product-stage-body">
+        <p>Zepto Pass (roughly ₹100–149/month) offers free delivery and priority access. The subscription model changes the user's psychology: once someone pays a monthly fee, they feel compelled to use the service to justify the cost — economists call this a "sunk cost nudge." This is distinct from the initial discount phase: it's self-reinforcing retention, not paid retention.</p>
+        <p>The DRHP reports 40+ lakh subscribers contributing approximately ₹480 crore annually in FY25. That's a meaningful signal that some users have crossed from occasional to committed. I compared this to Blinkit's Club membership and Swiggy One — Zepto's pricing is competitive but the subscriber base appears smaller relative to their user base.</p>
+        <div class="stage-behaviour"><strong>Behaviour being installed:</strong> "I've paid for Zepto Pass, so I should use it for everything I can — vegetables, snacks, phone chargers, medicines."</div>
+      </div>
+    </div>
+    <div class="product-stage" onclick="toggleStage(this)">
+      <div class="product-stage-header">
+        <div class="product-stage-num">3</div>
+        <div class="product-stage-name">Search and discovery — basket expansion mechanism</div>
+        <div style="margin-label:auto;font-size:18px;color:var(--ink-30);">+</div>
+      </div>
+      <div class="product-stage-body">
+        <p>I spent time observing the in-app search experience and comparing it to Blinkit. Zepto's search is notably aggressive about showing sponsored results and related category suggestions. When you search for "chips," you get chips, but also soft drinks, dips, and a branded snacks section — all of which may be sponsored placements.</p>
+        <p>This is not accidental. The app is deliberately expanding the user's basket size. Every additional category a user discovers through search is a category they previously sourced elsewhere (kirana, BigBasket, a supermarket). Converting those purchases to Zepto increases AOV, reduces competitor surface area, and contributes to the 2.6 → 18 category expansion the DRHP reports.</p>
+        <div class="stage-behaviour"><strong>Behaviour being installed:</strong> "Zepto has everything I need. I don't need to go to the supermarket anymore."</div>
+      </div>
+    </div>
+    <div class="product-stage" onclick="toggleStage(this)">
+      <div class="product-stage-header">
+        <div class="product-stage-num">4</div>
+        <div class="product-stage-name">Notifications — the re-engagement layer</div>
+        <div style="margin-left:auto;font-size:18px;color:var(--ink-30);">+</div>
+      </div>
+      <div class="product-stage-body">
+        <p>The DRHP mentions a 15% improvement in 30-day retention from targeted re-marketing of lapsed users. Zepto's notification cadence is aggressive — I tracked approximately 8–12 push notifications per week during a recent test period. The notifications include price alerts, flash sales, and personalised product suggestions.</p>
+        <p>This is a double-edged mechanism. Re-engagement notifications prevent churn among occasional users, but they also represent continued paid engagement effort. The question is whether notifications are maintaining organically formed habits or compensating for habits that never fully formed. The 15% re-engagement improvement doesn't distinguish between these.</div>
+        <div class="stage-behaviour"><strong>Behaviour being installed (or artificially sustained):</strong> "I haven't ordered in two weeks — here's a reminder with a 20% offer on something you've bought before."</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="confidence-block reveal mt32">
+    <div class="confidence-header">
+      <span class="confidence-label">Conclusion confidence — Question 2</span>
+      <span class="confidence-level medium">Medium confidence — split finding</span>
+    </div>
+    <div class="confidence-track"><div class="confidence-fill medium" style="width:52%"></div></div>
+    <div class="confidence-text">The evidence is genuinely mixed and I changed my view partway through this investigation. For FY23 cohorts, the retention data is better than I expected and the category expansion signal is credible. For FY25–26 cohorts, the early retention numbers are materially weaker. Whether this gap closes over time is the single most important open question.</div>
+    <div class="confidence-why">Why split confidence: Two real data points pointing in opposite directions. I cannot resolve the FY25 cohort question from available public data, and I'm unwilling to speculate past what the evidence supports.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- ───────────────────────────────────────────── -->
+<!-- QUESTION 3 -->
+<!-- ───────────────────────────────────────────── -->
+<hr class="section-divider">
+<div id="q3" class="section-full bg-tint">
+<div class="section" style="padding-top:0; padding-bottom:0;">
+
+  <div class="q-header reveal">
+    <div class="q-tag"><div class="q-tag-dot"></div>Question 3</div>
+    <h2 class="q-title">Does advertising revenue replace subsidy economics at scale?</h2>
+    <div class="q-hypothesis">
+      <div class="q-hypothesis-label">My hypothesis going in</div>
+      <div class="q-hypothesis-text">I initially dismissed the advertising thesis as a convenient narrative that companies attach to themselves when their core economics don't work. Amazon has made this model real, but Amazon also had 20 years and a completely different scale. I didn't expect Zepto's ad product to be meaningful yet. I was wrong.</div>
+    </div>
+  </div>
+
+  <div class="split-40-60 reveal">
+    <div>
+      <div class="data-card">
+        <div class="data-card-label">Ad revenue FY24</div>
+        <div class="data-card-value">₹49 Cr</div>
+        <div class="data-card-delta">1.1% of revenue</div>
+      </div>
+      <div class="data-card">
+        <div class="data-card-label">Ad revenue FY26</div>
+        <div class="data-card-value positive">₹1,636 Cr</div>
+        <div class="data-card-delta">7.2% of revenue — 33× growth in 2 years</div>
+      </div>
+      <div class="data-card">
+        <div class="data-card-label">Ad revenue as % of GMV</div>
+        <div class="data-card-value">7.78%</div>
+        <div class="data-card-delta">Up from 1.11% in FY24</div>
+        <div class="data-card-note">Amazon's advertising is ~7–8% of GMV in mature markets. Zepto is approaching this benchmark significantly faster than I anticipated. This is the finding that most changed my overall assessment.</div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>The advertising trajectory is the data point I underweighted going into this investigation. Ad revenue grew from ₹49 crore in FY24 to ₹1,636 crore in FY26 — a 33× increase in two years. As a percentage of GMV, it went from 1.11% to 7.78%. Amazon's advertising business (considered the most sophisticated retail ad platform in the world) operates at roughly 7–8% of GMV in mature markets.</p>
+      <p>I want to explain why this matters for the core question about discounts. If Zepto can sell advertising at 7–8% of GMV, the unit economics of the entire business change. A brand like Nestlé pays wholesale price for Maggi that Zepto sells at a discount. Nestlé accepts this because it gets volume. But then Nestlé pays again — for priority placement in Zepto's search results, for category banners, for promoted listings. That second payment is substantially higher-margin than the grocery transaction itself.</p>
+      <p>In this model, the grocery discount isn't waste. It's customer acquisition cost for the advertising platform. The question is whether this reframing holds at Zepto's scale, or whether it's a narrative that only works after a certain density of users and brands.</p>
+      <div class="finding">The advertising revenue trajectory is the most significant positive surprise in this investigation. The rate of growth from 1.1% to 7.8% of GMV in two years exceeds what I would have predicted. If this sustains, it materially improves the path to profitability — independent of whether Zepto reduces discounts.</div>
+      <div class="counter">
+        <div class="counter-label">What I'm still not sure about</div>
+        Zepto's advertising is still much smaller in absolute terms than Blinkit's. As Blinkit pulls further ahead on market share, the better-performing ad inventory may shift toward Blinkit — brands pay for reach, and 46% market share commands more premium placement than 29%. If Zepto loses share, the advertising flywheel could slow precisely when it needs to accelerate.
+      </div>
+    </div>
+  </div>
+
+  <!-- Competitor comparison -->
+  <div class="mt48 reveal">
+    <h3 style="font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-60);margin-bottom:20px;">Competitor comparison — how Zepto sits in the landscape</h3>
+    <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border);">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Platform</th>
+            <th>Market Share</th>
+            <th>Cash Reserves</th>
+            <th>EBITDA/Order FY26</th>
+            <th>Parent Advantage</th>
+            <th>Ad Revenue Maturity</th>
+            <th>Key Structural Risk</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="co-name co-zepto">Zepto</td>
+            <td><span class="badge b-amber">~29%</span></td>
+            <td>~$700M</td>
+            <td style="font-family:var(--mono);color:var(--coral);">–₹59</td>
+            <td><span class="badge b-red">None</span></td>
+            <td><span class="badge b-amber">Emerging — 7.8% GMV</span></td>
+            <td>No cross-subsidy. Exposed to funding gap.</td>
+          </tr>
+          <tr>
+            <td class="co-name">Blinkit (Eternal)</td>
+            <td><span class="badge b-green">~46%</span></td>
+            <td>~$1.7B</td>
+            <td style="font-family:var(--mono);color:#059669;">+₹3.02</td>
+            <td><span class="badge b-green">Zomato food cross-subsidy</span></td>
+            <td><span class="badge b-green">Ahead — larger GMV base</span></td>
+            <td>Dependent on Zomato group profitability.</td>
+          </tr>
+          <tr>
+            <td class="co-name">Swiggy Instamart</td>
+            <td><span class="badge b-purple">~25%</span></td>
+            <td>~$1.9B</td>
+            <td style="font-family:var(--mono);color:var(--coral);">Still negative</td>
+            <td><span class="badge b-purple">Food bundling via Swiggy One</span></td>
+            <td><span class="badge b-amber">In progress</span></td>
+            <td>Food delivery growth slowing; QC funded by IPO capital.</td>
+          </tr>
+          <tr style="opacity:0.55">
+            <td class="co-name">Dunzo</td>
+            <td><span class="badge b-red">~0%</span></td>
+            <td>Depleted</td>
+            <td style="font-family:var(--mono);">N/A</td>
+            <td><span class="badge b-red">None</span></td>
+            <td><span class="badge b-red">Never reached scale</span></td>
+            <td>The clearest cautionary case: no parent, no capital, no survival.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:12px;font-weight:300;color:var(--ink-60);margin-top:10px;line-height:1.6;">Sources: Eternal Q4 FY26 earnings. Zepto DRHP. Swiggy DRHP. Whalesbook market share estimates. Cash reserve figures are estimates based on last disclosed positions.</p>
+  </div>
+
+  <div class="confidence-block reveal mt32">
+    <div class="confidence-header">
+      <span class="confidence-label">Conclusion confidence — Question 3</span>
+      <span class="confidence-level high">Moderately high confidence</span>
+    </div>
+    <div class="confidence-track"><div class="confidence-fill high" style="width:72%"></div></div>
+    <div class="confidence-text">The advertising revenue growth is verifiable from audited DRHP figures. The trajectory toward Amazon-level ad monetisation is genuine and faster than expected. The uncertainty is whether Zepto can sustain this growth while Blinkit leads on market share — brands ultimately follow eyeballs.</div>
+    <div class="confidence-why">Why higher: This is based on audited financial disclosures, not proxy data. The 33× growth in 2 years is not in question. Why not highest: Future trajectory depends on market share dynamics that are genuinely competitive and uncertain.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- ───────────────────────────────────────────── -->
+<!-- QUESTION 4 -->
+<!-- ───────────────────────────────────────────── -->
+<hr class="section-divider">
+<div id="q4" class="section-full bg-white">
+<div class="section" style="padding-top:0; padding-bottom:0;">
+
+  <div class="q-header reveal">
+    <div class="q-tag"><div class="q-tag-dot"></div>Question 4</div>
+    <h2 class="q-title">Can the business actually become profitable before capital runs out?</h2>
+    <div class="q-hypothesis">
+      <div class="q-hypothesis-label">My hypothesis going in</div>
+      <div class="q-hypothesis-text">I expected the answer to be "probably not, unless they cut discounts sharply." The trajectory data partially changed this view — the improvement in per-order economics is faster than I expected. But the capital structure question remains the most uncomfortable part of the thesis.</div>
+    </div>
+  </div>
+
+  <!-- Funding timeline -->
+  <div class="reveal">
+    <div style="font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-60);margin-bottom:16px;">Funding history — the capital deployed</div>
+    <div class="timeline-scroll-wrap">
+      <div class="timeline-track">
+        <div class="tl-item">
+          <div class="tl-date">Oct 2021</div>
+          <div class="tl-dot"></div>
+          <div class="tl-label">Series A</div>
+          <div class="tl-amount">$60M · $225M val.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">Dec 2021</div>
+          <div class="tl-dot"></div>
+          <div class="tl-label">Series C</div>
+          <div class="tl-amount">$100M · $570M val.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">May 2022</div>
+          <div class="tl-dot"></div>
+          <div class="tl-label">Series D</div>
+          <div class="tl-amount">$200M · $900M val.</div>
+        </div>
+        <div class="tl-item event-positive">
+          <div class="tl-date">Jun 2022</div>
+          <div class="tl-dot"></div>
+          <div class="tl-label">Blinkit acquired by Zomato at 43% haircut</div>
+          <div class="tl-amount">Competitive shift</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">Nov 2023</div>
+          <div class="tl-dot"></div>
+          <div class="tl-label">Series E</div>
+          <div class="tl-amount">~$200M · $1.4B val.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">Jun 2024</div>
+          <div class="tl-dot"></div>
+          <div class="tl-label">Series F</div>
+          <div class="tl-amount">$665M · $3.6B val.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">Aug 2024</div>
+          <div class="tl-dot"></div>
+          <div class="tl-label">Series G</div>
+          <div class="tl-amount">$340M · $5B val.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">Oct 2025</div>
+          <div class="tl-dot"></div>
+          <div class="tl-label">Series H (CalPERS)</div>
+          <div class="tl-amount">$450M · $7B val.</div>
+        </div>
+        <div class="tl-item event-positive">
+          <div class="tl-date">Jul 2026</div>
+          <div class="tl-dot"></div>
+          <div class="tl-label">IPO target</div>
+          <div class="tl-amount">₹8,010 Cr fresh issue</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="split reveal mt32">
+    <div class="prose">
+      <p>The profitability trajectory is genuinely improving, and faster than I initially assumed. EBITDA loss per order fell from ₹136 in FY25 to ₹59 in Q4 FY26 — a 57% improvement in under a year. Total cost per order fell from ₹181 to ₹128 between Q2 and Q4 FY26 alone.</p>
+      <p>The mechanism behind this improvement is worth understanding. More orders per dark store per day means fixed costs are spread across more deliveries. Orders per store per day went from roughly 1,325 in FY24 to 2,140 in Q4 FY26. This is operating leverage — the cost structure doesn't scale linearly with order volume, so each incremental order improves margins.</p>
+      <p>The problem is the capital structure. Zepto's estimated cash position is around $700–900 million (per CEO statements and inferred from fundraising history). At the FY26 operating cash outflow rate of ₹3,462 crore, that gives roughly 18–24 months of runway before the IPO capital becomes necessary. The IPO is not just a milestone — it's a capital necessity.</p>
+      <div class="counter">
+        <div class="counter-label">The Blinkit comparison I found uncomfortable</div>
+        Blinkit's adjusted EBITDA per order in FY26 was +₹3.02 — positive. Zepto's was –₹59. They operate in the same market, sell the same products, and use the same dark store model. The gap represents roughly 2–3 years of operational maturity. Blinkit also has ₹1.7 billion in cash versus Zepto's ~$700 million. In a prolonged discount war, Zepto faces this gap while holding less capital.
+      </div>
+      <p>The counter-argument — which I think is legitimate — is that Blinkit had Zomato's cash and cross-subsidy to reach profitability, which Zepto cannot access. What Zepto achieved independently (reaching ₹22,624 crore in revenue while approaching per-order breakeven) may be structurally harder than what Blinkit accomplished with a listed parent funding its losses. Whether that makes Zepto's trajectory more impressive or more precarious depends on your view of the IPO.</p>
+    </div>
+
+    <div>
+      <div class="metrics-row reveal">
+        <div class="metric">
+          <span class="metric-label">Revenue FY26</span>
+          <span class="metric-val">₹22,624 Cr</span>
+          <span class="metric-sub">↑ 104% YoY</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Net loss FY26</span>
+          <span class="metric-val neg">₹5,905 Cr</span>
+          <span class="metric-sub">Loss ratio 26% (was 42% FY25)</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">EBITDA loss/order Q4</span>
+          <span class="metric-val neg">₹59</span>
+          <span class="metric-sub">↓ from ₹136 in FY25</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Op cash outflow FY26</span>
+          <span class="metric-val neg">₹3,462 Cr</span>
+          <span class="metric-sub">↓ from ₹4,625 Cr FY25</span>
+        </div>
+      </div>
+
+      <!-- Scenario toggle -->
+      <div class="reveal mt24">
+        <div style="font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-60);margin-bottom:14px;">Three profitability scenarios — toggle to explore</div>
+        <div class="scenario-tabs">
+          <button class="scenario-tab active-bull" onclick="showScenario('bull',this)">Bull</button>
+          <button class="scenario-tab" onclick="showScenario('base',this)">Base</button>
+          <button class="scenario-tab" onclick="showScenario('bear',this)">Bear</button>
+        </div>
+
+        <div class="scenario-panel visible" id="sp-bull">
+          <div class="scenario-grid">
+            <div class="scenario-metric">
+              <span class="scenario-metric-label">FY28 Revenue</span>
+              <div class="scenario-metric-val" style="color:#059669">₹60,000 Cr</div>
+              <div class="scenario-metric-note">~3× FY26. Orders reach 5M+/day.</div>
+            </div>
+            <div class="scenario-metric">
+              <span class="scenario-metric-label">EBITDA Margin</span>
+              <div class="scenario-metric-val" style="color:#059669">+2 to +4%</div>
+              <div class="scenario-metric-note">Breakeven by Q2 FY27. Profitable FY28.</div>
+            </div>
+            <div class="scenario-metric">
+              <span class="scenario-metric-label">Implied Valuation</span>
+              <div class="scenario-metric-val" style="color:#059669">$15–20B</div>
+              <div class="scenario-metric-note">Premium over Blinkit. QC market leadership.</div>
+            </div>
+          </div>
+          <div class="scenario-assumption-box">
+            <strong>This scenario requires:</strong> FY25 cohort retention matures to 40%+. Advertising reaches 12%+ of GMV. No new deep-pocketed entrant (Reliance, Amazon). Competitive discount intensity eases after IPO stabilises funding.
+          </div>
+          <div style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--ink-60);">My probability estimate: 25–30%. Possible, but requires several things to go right simultaneously.</div>
+        </div>
+
+        <div class="scenario-panel" id="sp-base">
+          <div class="scenario-grid">
+            <div class="scenario-metric">
+              <span class="scenario-metric-label">FY28 Revenue</span>
+              <div class="scenario-metric-val">₹40,000 Cr</div>
+              <div class="scenario-metric-note">~2× FY26. Steady but not explosive.</div>
+            </div>
+            <div class="scenario-metric">
+              <span class="scenario-metric-label">EBITDA Margin</span>
+              <div class="scenario-metric-val" style="color:#A16207">–2 to 0%</div>
+              <div class="scenario-metric-note">Near-breakeven. 2–3 more years to profitability.</div>
+            </div>
+            <div class="scenario-metric">
+              <span class="scenario-metric-label">Implied Valuation</span>
+              <div class="scenario-metric-val">$8–12B</div>
+              <div class="scenario-metric-note">Broadly in line with IPO target.</div>
+            </div>
+          </div>
+          <div class="scenario-assumption-box">
+            <strong>This scenario requires:</strong> FY25 cohorts partially — not fully — follow FY23 retention curve. IPO provides adequate capital bridge. Competitive intensity holds at current levels rather than escalating.
+          </div>
+          <div style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--ink-60);">My probability estimate: 45%. The most likely outcome given current trajectory.</div>
+        </div>
+
+        <div class="scenario-panel" id="sp-bear">
+          <div class="scenario-grid">
+            <div class="scenario-metric">
+              <span class="scenario-metric-label">FY28 Revenue</span>
+              <div class="scenario-metric-val" style="color:var(--coral)">₹25,000 Cr</div>
+              <div class="scenario-metric-note">Growth stalls. Market share lost to Blinkit.</div>
+            </div>
+            <div class="scenario-metric">
+              <span class="scenario-metric-label">EBITDA Margin</span>
+              <div class="scenario-metric-val" style="color:var(--coral)">–8 to –12%</div>
+              <div class="scenario-metric-note">Losses widen. Capital burn accelerates.</div>
+            </div>
+            <div class="scenario-metric">
+              <span class="scenario-metric-label">Implied Valuation</span>
+              <div class="scenario-metric-val" style="color:var(--coral)">$3–5B</div>
+              <div class="scenario-metric-note">Below last private round. Down-round risk.</div>
+            </div>
+          </div>
+          <div class="scenario-assumption-box">
+            <strong>This scenario requires:</strong> FY25+ cohort retention stagnates at 31%. Blinkit's cash advantage compounds into widening market share lead. Regulatory issues (ED/FEMA, CCPA, CCI) distract leadership during critical IPO period.
+          </div>
+          <div style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--ink-60);">My probability estimate: 25%. Lower than I initially expected, given the per-order economics improvement.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="confidence-block reveal mt32">
+    <div class="confidence-header">
+      <span class="confidence-label">Conclusion confidence — Question 4</span>
+      <span class="confidence-level medium">Medium confidence</span>
+    </div>
+    <div class="confidence-track"><div class="confidence-fill medium" style="width:55%"></div></div>
+    <div class="confidence-text">The per-order economics are improving faster than I expected. The capital structure question is more precarious than the revenue growth suggests. Both things are true. The base case (near-breakeven by FY28) seems more likely than I initially assumed, but the bear case is real if cohort retention doesn't improve.</div>
+    <div class="confidence-why">Why medium: The path to profitability is plausible but depends on the FY25 cohort question that won't resolve until 2027. The capital runway is tight enough that the IPO isn't optional.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- ───────────────────────────────────────────── -->
+<!-- QUESTION 5 -->
+<!-- ───────────────────────────────────────────── -->
+<hr class="section-divider">
+<div id="q5" class="section-full bg-tint">
+<div class="section" style="padding-top:0; padding-bottom:0;">
+
+  <div class="q-header reveal">
+    <div class="q-tag"><div class="q-tag-dot"></div>Question 5</div>
+    <h2 class="q-title">What conditions would make my entire thesis wrong?</h2>
+    <div class="q-hypothesis">
+      <div class="q-hypothesis-label">Why I investigated this last</div>
+      <div class="q-hypothesis-text">I think any analysis that only builds the case for its conclusion is incomplete. This section is an attempt to steelman the bear case — not as a counterpoint to my conclusions, but as a genuine stress test of whether I've missed something important.</div>
+    </div>
+  </div>
+
+  <!-- Evidence cards -->
+  <div class="evidence-stack reveal">
+    <div class="evidence-card">
+      <div class="evidence-card-header" onclick="toggleEvidence(this.parentElement)">
+        <div class="evidence-card-title">
+          <span class="evidence-reliability rel-high">High reliability</span>
+          The Nash equilibrium problem — no one can stop discounting first
+        </div>
+        <div class="evidence-card-toggle">+</div>
+      </div>
+      <div class="evidence-card-body">
+        <p>This is the structural risk I find most credible. All three platforms — Zepto, Blinkit, Instamart — know that sustained discounting damages their unit economics. But none can unilaterally reduce subsidies without immediately ceding market share to the others. The result is what game theorists call a Nash equilibrium: everyone is behaving rationally given what competitors are doing, but the collective outcome (perpetual losses) is irrational.</p>
+        <p>The clearest evidence of this is the combined sector cash burn. Despite all three platforms collectively losing approximately ₹9,000 crore over a nine-to-eleven month period, no platform has meaningfully reduced promotional intensity. The March 2026 sequential user count decline at Zepto — despite spending ₹1,389 crore on advertising that year — suggests the discounts may be working less efficiently than before.</p>
+        <p>What would change this: A platform reaching sufficient market dominance that it could raise prices without losing meaningful share. Blinkit at 46% share is closest to this position. If Blinkit reaches 55%+ and begins reducing subsidies, it could force a sector-wide repricing. That benefits Blinkit, not Zepto.</p>
+        <div class="evidence-source">Source: Moneycontrol sector analysis · Eternal Q4 FY26 disclosures · Zepto DRHP</div>
+      </div>
+    </div>
+
+    <div class="evidence-card">
+      <div class="evidence-card-header" onclick="toggleEvidence(this.parentElement)">
+        <div class="evidence-card-title">
+          <span class="evidence-reliability rel-high">High reliability</span>
+          FY25–26 cohort retention — the number that keeps me honest
+        </div>
+        <div class="evidence-card-toggle">+</div>
+      </div>
+      <div class="evidence-card-body">
+        <p>I've mentioned the FY25 cohort retention figure (31.1%) throughout this investigation, but I want to be explicit here about what it would mean if this isn't a temporary cohort lag. If users acquired in FY25 and FY26 — who represent a large majority of Zepto's current user base — retain at only 31% rather than 47%, the LTV calculations change substantially. At 31% retention, the payback period on customer acquisition cost extends significantly, and the advertising revenue per user also declines.</p>
+        <p>The argument I've been giving this number the benefit of the doubt on is that newer geographies and user segments often take longer to form habits. FY23 users were primarily metro, tech-savvy, and relatively high-income. FY25–26 users include more Tier-2 city residents and more price-sensitive demographics. It's possible the retention curve looks the same — just shifted 6–8 quarters later.</p>
+        <p>But I cannot verify this. And if it's wrong, the entire habit formation thesis is weaker than I've concluded.</p>
+        <div class="evidence-source">Source: Zepto DRHP · GrowthX analysis</div>
+      </div>
+    </div>
+
+    <div class="evidence-card">
+      <div class="evidence-card-header" onclick="toggleEvidence(this.parentElement)">
+        <div class="evidence-card-title">
+          <span class="evidence-reliability rel-med">Medium reliability</span>
+          Regulatory overhang — ED, CCPA, CCI, all concurrent
+        </div>
+        <div class="evidence-card-toggle">+</div>
+      </div>
+      <div class="evidence-card-body">
+        <p>I initially dismissed the regulatory risks as standard-issue noise around a fast-growing startup. I revised this view slightly after reading the DRHP disclosures carefully. The ED summons to both co-founders in April 2026 under FEMA relates to foreign investment documentation — the DRHP discloses this explicitly. The CCPA issued a penalty for "dark patterns" (basket sneaking, drip pricing) that Zepto has appealed. CCI is examining predatory pricing.</p>
+        <p>None of these individually is likely fatal. Collectively, happening simultaneously immediately before an IPO, they represent a meaningful governance distraction. The SEBI eligibility disclosure — that Zepto doesn't meet standard listing criteria and is using a special growth-stage provision — is also worth noting for retail investors, though it doesn't change the underlying business analysis.</p>
+        <p>My reliability rating here is "medium" because I can't assess the probability or severity of these regulatory outcomes from public information alone.</p>
+        <div class="evidence-source">Source: Zepto DRHP · SEBI regulations · Economic Times reporting</div>
+      </div>
+    </div>
+
+    <div class="evidence-card">
+      <div class="evidence-card-header" onclick="toggleEvidence(this.parentElement)">
+        <div class="evidence-card-title">
+          <span class="evidence-reliability rel-low">Lower reliability</span>
+          Amazon or Reliance enters quick commerce at scale
+        </div>
+        <div class="evidence-card-toggle">+</div>
+      </div>
+      <div class="evidence-card-body">
+        <p>Flipkart Minutes has already entered. Amazon has launched quick commerce in India. Reliance's JioMart operates at significant scale. I've rated this lower reliability not because the risk isn't real, but because I don't have sufficient data on how aggressively these players will expand.</p>
+        <p>The structural risk is straightforward: if Reliance or Amazon enter quick commerce with their existing supply chain advantages and customer relationships, they can sustain higher subsidies for longer than Zepto, Blinkit, or Instamart. The dark store buildout would be the primary barrier, and both have the capital to close that gap quickly if they choose to.</p>
+        <p>My honest assessment is that I don't know enough about Reliance's or Amazon's strategic priorities in India right now to assign a reliable probability to this scenario. I've flagged it as a risk but not modelled it explicitly.</p>
+        <div class="evidence-source">Source: Press reporting on Flipkart Minutes, Amazon Fresh India</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Risk register -->
+  <div class="mt32 reveal">
+    <div style="font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-60);margin-bottom:16px;">Risk register — probability and impact</div>
+    <div class="risk-item">
+      <div>
+        <div class="risk-name">Nash equilibrium discount trap</div>
+        <div class="risk-desc">No platform blinks first. Subsidies continue indefinitely despite collective agreement they're destructive. Sequential user decline in March 2026 may be an early signal.</div>
+      </div>
+      <div class="risk-pill-wrap">
+        <div class="risk-pill-label">Probability</div>
+        <div class="risk-pill pill-high">High</div>
+      </div>
+      <div class="risk-pill-wrap">
+        <div class="risk-pill-label">Impact</div>
+        <div class="risk-pill pill-high">High</div>
+      </div>
+    </div>
+    <div class="risk-item">
+      <div>
+        <div class="risk-name">FY25+ cohort retention doesn't improve</div>
+        <div class="risk-desc">Current 31% retention for FY25 cohorts is structural, not temporary. LTV calculations and advertising revenue per user both deteriorate. Entire habit thesis weakens.</div>
+      </div>
+      <div class="risk-pill-wrap">
+        <div class="risk-pill-label">Probability</div>
+        <div class="risk-pill pill-med">Medium</div>
+      </div>
+      <div class="risk-pill-wrap">
+        <div class="risk-pill-label">Impact</div>
+        <div class="risk-pill pill-high">Very High</div>
+      </div>
+    </div>
+    <div class="risk-item">
+      <div>
+        <div class="risk-name">Blinkit's cash advantage compounds</div>
+        <div class="risk-desc">Eternal uses food delivery profits to subsidise Blinkit's grocery prices below Zepto's floor. Zepto cannot respond without accelerating losses. Share gap widens.</div>
+      </div>
+      <div class="risk-pill-wrap">
+        <div class="risk-pill-label">Probability</div>
+        <div class="risk-pill pill-med">Medium</div>
+      </div>
+      <div class="risk-pill-wrap">
+        <div class="risk-pill-label">Impact</div>
+        <div class="risk-pill pill-high">High</div>
+      </div>
+    </div>
+    <div class="risk-item">
+      <div>
+        <div class="risk-name">Concurrent regulatory proceedings escalate</div>
+        <div class="risk-desc">ED, CCPA, CCI investigations coincide with IPO window. Leadership distraction affects execution quality during the most critical 12-month period in company history.</div>
+      </div>
+      <div class="risk-pill-wrap">
+        <div class="risk-pill-label">Probability</div>
+        <div class="risk-pill pill-med">Medium</div>
+      </div>
+      <div class="risk-pill-wrap">
+        <div class="risk-pill-label">Impact</div>
+        <div class="risk-pill pill-med">Medium</div>
+      </div>
+    </div>
+    <div class="risk-item">
+      <div>
+        <div class="risk-name">Amazon or Reliance enters at scale</div>
+        <div class="risk-desc">Structural supply chain advantages and deeper capital could sustain higher subsidies than the current trio. Dark store buildout is the only barrier, and neither has a capital constraint.</div>
+      </div>
+      <div class="risk-pill-wrap">
+        <div class="risk-pill-label">Probability</div>
+        <div class="risk-pill pill-low">Lower</div>
+      </div>
+      <div class="risk-pill-wrap">
+        <div class="risk-pill-label">Impact</div>
+        <div class="risk-pill pill-high">Very High</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="confidence-block reveal mt32">
+    <div class="confidence-header">
+      <span class="confidence-label">Overall thesis integrity check</span>
+      <span class="confidence-level medium">Conditionally sound</span>
+    </div>
+    <div class="confidence-track"><div class="confidence-fill medium" style="width:60%"></div></div>
+    <div class="confidence-text">My thesis is not broken by any single one of these risks. It would be broken by the combination of: FY25 cohort retention stagnating at 31% AND Blinkit widening its lead past 50% market share AND the IPO raising less than ₹8,000 crore. I estimate the probability of all three occurring simultaneously at around 15–20%.</div>
+    <div class="confidence-why">The Nash equilibrium risk is real and ongoing. It's the risk I find most credible and least resolvable from current public data.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- ───────────────────────────────────────────── -->
+<!-- VERDICT -->
+<!-- ───────────────────────────────────────────── -->
+<hr class="section-divider">
+<div id="verdict" class="section-full" style="background: linear-gradient(180deg, var(--purple-deep) 0%, #2D0060 100%); color:white;">
+<div class="section" style="padding-top:0; padding-bottom:0;">
+
+  <div class="q-header reveal" style="border-color:rgba(255,255,255,0.1);">
+    <div class="q-tag" style="color:var(--coral-light);">
+      <div class="q-tag-dot" style="background:var(--coral-light)"></div>Investment Verdict
+    </div>
+    <h2 class="q-title" style="color:white; max-width:700px;">Where I landed after five months of research — and what I still don't know</h2>
+  </div>
+
+  <div class="split-60-40 reveal">
+    <div>
+      <p style="font-size:16px;font-weight:300;color:rgba(255,255,255,0.75);line-height:1.8;margin-bottom:20px;">My initial assumption going in was that Zepto's discount strategy was a cash bonfire dressed up in startup language. I expected to find weak retention, minimal structural advantage, and a business that would contract sharply as capital constraints tightened.</p>
+      <p style="font-size:15px;font-weight:300;color:rgba(255,255,255,0.65);line-height:1.8;margin-bottom:20px;">The evidence changed parts of that view. The FY23 cohort retention of 45–49% is a real number, not a narrative. The 91% decline in digital marketing cost per order is audited and points in a consistent direction. The advertising revenue growing to 7.8% of GMV in two years is a concrete commercial achievement, not a projection.</p>
+      <p style="font-size:15px;font-weight:300;color:rgba(255,255,255,0.65);line-height:1.8;margin-bottom:20px;">What the evidence did not change: the FY25 cohort retention gap is real and unresolved. The capital structure is tight enough that the IPO isn't optional. Blinkit is ahead on both economics and cash reserves.</p>
+
+      <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:28px;margin-top:32px;border-left:3px solid var(--coral);">
+        <div style="font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--coral-light);margin-bottom:14px;">My conditional verdict</div>
+        <p style="font-size:16px;font-weight:400;color:white;line-height:1.75;margin-bottom:16px;">Zepto's discount strategy did create something beyond purchased growth — but whether it created <em>sufficient</em> durability to justify the capital cost depends on a data point that won't exist until 2027: whether FY25 cohorts follow the FY23 retention curve.</p>
+        <p style="font-size:14px;font-weight:300;color:rgba(255,255,255,0.65);line-height:1.7;">At the last private valuation of $7B, I would not invest without seeing that cohort data. At the IPO (if priced closer to $8–9B with public market liquidity), the risk-reward is more interesting — the advertising flywheel justifies a longer runway than the grocery P&L alone suggests.</p>
+      </div>
+
+      <div style="margin-top:28px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div style="background:rgba(5,150,105,0.12);border-radius:8px;padding:16px 18px;">
+          <div style="font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#7EE8A2;margin-bottom:8px;">I would invest if</div>
+          <div style="font-size:13px;font-weight:300;color:rgba(255,255,255,0.7);line-height:1.6;">FY25 cohort retention reaches 38%+ by Q3 FY27. Ad revenue crosses 10% of GMV. IPO priced with reasonable discount to intrinsic value.</div>
+        </div>
+        <div style="background:rgba(232,66,90,0.12);border-radius:8px;padding:16px 18px;">
+          <div style="font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--coral-light);margin-bottom:8px;">I would not invest if</div>
+          <div style="font-size:13px;font-weight:300;color:rgba(255,255,255,0.7);line-height:1.6;">FY25 cohort retention stays at 31%. Blinkit exceeds 50% market share before IPO. ED/FEMA proceedings escalate materially.</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:28px;">
+        <div style="font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:20px;">What I'd ask Zepto's founders if I had an hour</div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.07);">
+            <div style="font-size:13px;font-weight:500;color:white;margin-bottom:4px;">1. What does your FY25 cohort 8-quarter retention curve look like internally?</div>
+            <div style="font-size:12px;font-weight:300;color:rgba(255,255,255,0.45);line-height:1.6;">This is the number no external analyst can access and the one that would most change my view in either direction.</div>
+          </div>
+          <div style="padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.07);">
+            <div style="font-size:13px;font-weight:500;color:white;margin-bottom:4px;">2. What proportion of Zepto Pass subscribers joined without a promotional offer?</div>
+            <div style="font-size:12px;font-weight:300;color:rgba(255,255,255,0.45);line-height:1.6;">Organic subscription signup is a cleaner signal of real commitment than discounted or bundled acquisition.</div>
+          </div>
+          <div style="padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.07);">
+            <div style="font-size:13px;font-weight:500;color:white;margin-bottom:4px;">3. How does dark store profitability vary between FY23 vintage stores and FY25 vintage stores?</div>
+            <div style="font-size:12px;font-weight:300;color:rgba(255,255,255,0.45);line-height:1.6;">If newer stores have worse economics, the expansion into Tier-2 may be diluting the aggregate metrics.</div>
+          </div>
+          <div style="padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.07);">
+            <div style="font-size:13px;font-weight:500;color:white;margin-bottom:4px;">4. What percentage of ad revenue comes from the top 20 brand advertisers?</div>
+            <div style="font-size:12px;font-weight:300;color:rgba(255,255,255,0.45);line-height:1.6;">Concentration risk in advertising can turn into negotiating risk at scale.</div>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:500;color:white;margin-bottom:4px;">5. What's the plan if the IPO market conditions deteriorate before July?</div>
+            <div style="font-size:12px;font-weight:300;color:rgba(255,255,255,0.45);line-height:1.6;">The IPO isn't optional given cash runway. What's the contingency?</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:24px;margin-top:16px;">
+        <div style="font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:16px;">What I'd investigate next</div>
+        <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;font-weight:300;color:rgba(255,255,255,0.6);line-height:1.6;">
+          <div>→ App store review analysis (200+ reviews) to understand category and geography-level satisfaction differences</div>
+          <div>→ Dark store level economics using Zomato's disclosed per-store data as a Blinkit proxy</div>
+          <div>→ Zepto Pass pricing elasticity — at what price does subscription drop-off begin?</div>
+          <div>→ Brand advertiser concentration — top-10 advertisers as % of total ad revenue</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Final confidence -->
+  <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:28px;margin-top:48px;" class="reveal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <span style="font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.4);">Overall investigation confidence</span>
+      <span style="font-family:var(--mono);font-size:11px;font-weight:500;color:#FFD166;">Medium — conditionally sound thesis with one unresolved variable</span>
+    </div>
+    <div style="height:4px;background:rgba(255,255,255,0.1);border-radius:2px;margin-bottom:16px;overflow:hidden;">
+      <div style="height:100%;width:62%;background:#FFD166;border-radius:2px;"></div>
+    </div>
+    <div style="font-size:14px;font-weight:300;color:rgba(255,255,255,0.65);line-height:1.75;">The FY25 cohort retention question is the single variable that would most change this verdict. Everything else in the analysis — advertising trajectory, per-order economics improvement, market size — points in a direction that supports a qualified positive view. But this investigation cannot answer the cohort question, and I'm not willing to pretend it can. The honest conclusion is: the thesis is plausible, the trajectory is positive, and the key test arrives in 2027.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- FOOTER -->
+<footer id="footer">
+  <div class="footer-grid">
+    <div class="footer-about">
+      <h3>About this investigation</h3>
+      <p>This is an independent research project built as a portfolio piece by Chelscy, a second-year B.Com (Hons.) student at Indraprastha College for Women, Delhi University, pursuing CS from ICSI. All data is sourced from public documents. This is not investment advice.</p>
+      <p style="margin-top:12px;">The goal was to think rigorously about a company I use every day and arrive at a defensible, evidence-based conclusion — rather than a polished one.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Primary Sources</h4>
+      <ul>
+        <li>Zepto DRHP (Jun 2026)</li>
+        <li>Zomato Annual Report FY26</li>
+        <li>Swiggy IPO DRHP (2024)</li>
+        <li>SEBI filings</li>
+        <li>Eternal Q4 FY26 earnings</li>
+        <li>Morgan Stanley QC report</li>
+        <li>CLSA App-racadabra</li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Sections</h4>
+      <ul>
+        <li><a href="#about">About this research</a></li>
+        <li><a href="#q1">Q1 — Acquisition</a></li>
+        <li><a href="#q2">Q2 — Habit formation</a></li>
+        <li><a href="#q3">Q3 — Ad economics</a></li>
+        <li><a href="#q4">Q4 — Profitability</a></li>
+        <li><a href="#q5">Q5 — Risk stress test</a></li>
+        <li><a href="#verdict">Verdict</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Independent research · Not investment advice · All sources public · June 2026</p>
+    <p>Built as a portfolio project · Zepto is a registered trademark of KiranaKart Technologies</p>
+  </div>
+</footer>
+
+<script>
+/* ── PROGRESS BAR ─────────────────────────────── */
+window.addEventListener('scroll', () => {
+  const doc = document.documentElement;
+  const scrolled = doc.scrollTop / (doc.scrollHeight - doc.clientHeight) * 100;
+  document.getElementById('progress-fill').style.width = scrolled + '%';
+});
+
+/* ── SCROLL REVEAL ───────────────────────────── */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ── ACTIVE NAV ──────────────────────────────── */
+const sections = document.querySelectorAll('[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) current = s.id; });
+  navLinks.forEach(a => {
+    a.classList.remove('active');
+    if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+  });
+});
+
+/* ── UNIT ECONOMICS SIMULATOR ─────────────────── */
+function calcUE() {
+  const aov  = +document.getElementById('sl-aov').value;
+  const cogs = +document.getElementById('sl-cogs').value / 100;
+  const disc = +document.getElementById('sl-disc').value;
+  const del  = +document.getElementById('sl-del').value;
+  const CAC  = 1100;
+
+  document.getElementById('lbl-aov').textContent  = '₹' + aov;
+  document.getElementById('lbl-cogs').textContent = document.getElementById('sl-cogs').value + '%';
+  document.getElementById('lbl-disc').textContent = '₹' + disc;
+  document.getElementById('lbl-del').textContent  = '₹' + del;
+
+  const gm = Math.round(aov * (1 - cogs));
+  const cm = gm - del - disc;
+  const pb = cm > 0 ? Math.ceil(CAC / cm) : '∞';
+
+  const gmEl = document.getElementById('out-gm');
+  const cmEl = document.getElementById('out-cm');
+  const pbEl = document.getElementById('out-pb');
+
+  gmEl.textContent = '₹' + gm;
+  gmEl.className = 'sim-result-val ' + (gm > 0 ? 'good' : 'bad');
+
+  cmEl.textContent = (cm >= 0 ? '+₹' : '–₹') + Math.abs(cm);
+  cmEl.className = 'sim-result-val ' + (cm > 30 ? 'good' : cm > 0 ? 'warn' : 'bad');
+
+  pbEl.textContent = pb === '∞' ? '∞ orders' : '~' + pb + ' orders';
+  pbEl.className = 'sim-result-val ' + (typeof pb === 'number' && pb < 15 ? 'good' : typeof pb === 'number' && pb < 30 ? 'warn' : 'bad');
+}
+calcUE();
+
+/* ── LTV SIMULATOR ───────────────────────────── */
+function calcLTV() {
+  const ret  = +document.getElementById('sl-ret').value / 100;
+  const freq = +document.getElementById('sl-freq').value;
+  const cm   = 45; // ₹45 assumed contribution per order near-breakeven
+  const CAC  = 1100;
+
+  document.getElementById('lbl-ret').textContent  = document.getElementById('sl-ret').value + '%';
+  document.getElementById('lbl-freq').textContent = freq + 'x';
+
+  // Simplified LTV: avg retention-weighted months = 36 * ret
+  const activeMonths = 36 * ret;
+  const ltv = Math.round(activeMonths * freq * cm);
+  const ratio = (ltv / CAC).toFixed(1);
+  const payback = (CAC / (freq * cm)).toFixed(1);
+
+  const ltvEl = document.getElementById('out-ltv');
+  ltvEl.textContent = '₹' + ltv.toLocaleString('en-IN');
+  ltvEl.className = 'sim-result-val ' + (ltv > 5000 ? 'good' : ltv > 2000 ? 'warn' : 'bad');
+
+  const ratioEl = document.getElementById('out-ltvr');
+  ratioEl.textContent = ratio + 'x';
+  ratioEl.className = 'sim-result-val ' + (+ratio > 5 ? 'good' : +ratio > 2 ? 'warn' : 'bad');
+
+  document.getElementById('out-pbm').textContent = payback + ' mo';
+}
+calcLTV();
+
+/* ── EVIDENCE CARDS ──────────────────────────── */
+function toggleEvidence(card) {
+  card.classList.toggle('open');
+}
+
+/* ── PRODUCT STAGES ──────────────────────────── */
+function toggleStage(stage) {
+  stage.classList.toggle('open');
+  const toggle = stage.querySelector('.product-stage-header div:last-child');
+  if (toggle) toggle.textContent = stage.classList.contains('open') ? '–' : '+';
+}
+
+/* ── SCENARIO TABS ───────────────────────────── */
+function showScenario(which, btn) {
+  document.querySelectorAll('.scenario-panel').forEach(p => p.classList.remove('visible'));
+  document.querySelectorAll('.scenario-tab').forEach(t => {
+    t.classList.remove('active-bull', 'active-base', 'active-bear');
+  });
+  document.getElementById('sp-' + which).classList.add('visible');
+  btn.classList.add('active-' + which);
+}
+</script>
+</body>
+</html>
