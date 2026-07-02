@@ -132,7 +132,7 @@ Interested in:
 - Product
 - Finance
 
-LinkedIn: YOUR_LINKEDIN
+
 
 ---
 
